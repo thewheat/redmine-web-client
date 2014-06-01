@@ -1,0 +1,43 @@
+  body{
+    padding-top: 0;
+  }
+  .container-fluid{
+    background-color: #eee;
+  }
+  .issue.brief{
+    padding: 3px 5px;
+  }
+  .action .timer{
+    padding: 5px 5px 0 5px;
+  }
+  .section{
+    border-bottom: 1px solid #ccc;
+    padding: 5px;
+    margin-bottom: 5px;
+  }
+
+
+  form{
+    margin-bottom: 0;
+  }
+
+  
+  .issue.list .header{
+    padding: 5px;
+  }
+  ul.issues, ul.projects {
+    margin: 0;  
+  }
+    ul.issues li.issue, ul.projects li.project {
+      border-top: 1px dashed #333;
+      list-style: none;
+      padding: 5px;
+    }
+    ul.issues li.issue.priorityHigh,
+    ul.issues li.issue.priorityImmediate,
+    ul.issues li.issue.priorityUrgent {
+      background-color: #fbb;
+    }
+    .issue .priority{
+      font-weight: bold;
+    }
