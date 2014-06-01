@@ -1,6 +1,3 @@
-<style>
-
-</style>
 <div class="container-fluid">
   <div class="row-fluid">
     <div class='action'>
@@ -46,7 +43,7 @@
               <!-- <button class="btn" ng-click="addCommentAndClose()">Comment & Close</button> -->
           </form>          
         </div>
-        <div class='issue_update section' ng-show="selectedIssue != null">
+        <div class='issue_update section' ng-show="false && selectedIssue != null">
           <form class="form-inline" role="form">
             <textarea ng-model="issue_update_message" placeholder="Update Message"></textarea>
             <label class="checkbox-inline">Private? <input type="checkbox" ng-model="issue_update_private"></label>
@@ -123,7 +120,7 @@
         <form class="form-inline section" role="form" ng-show="show_projects" >
           <input ng-model="query_projects" placeholder='Search Projects'>
           <button class="btn" ng-click="loadProjects()" ng-show="show_projects">Refresh</button>
-          <button class="btn" ng-click="toggleAddProject()" ng-show="!add_project">+ Project</button>
+          <button class="btn" ng-click="toggleAddProject()" ng-show="false && !add_project">+ Project</button>
         </form>
         <div class='project section'  ng-show="add_project">
           <form class="form-inline" role="form">
@@ -146,9 +143,9 @@
             ng-repeat="row in projects | filter:query_projects">
           <a href="{{settings_server}}/projects/{{row.id}}" target="_blank">{{row.parent.name}} <span ng-show="row.parent != null"> - </span>{{row.name}}</a>
           <div class="btn-group">
-            <button class="btn btn-primary btn-small" ng-click="selectProjectRow(row)">Work</button>
-            <button class="btn btn-small" ng-click="selectProjectToAddSubProject(row)">+ Sub Project</button>
-            <button class="btn btn-info btn-small" ng-click="selectProjectToAddIssue(row)">+ Issue</button>
+            <button class="btn btn-primary btn-small" ng-click="selectProjectRow(row)">Start Work</button>
+            <button ng-show="false" class="btn btn-small" ng-click="selectProjectToAddSubProject(row)">+ Sub Project</button>
+            <button ng-show="false" class="btn btn-info btn-small" ng-click="selectProjectToAddIssue(row)">+ Issue</button>
           </div>
         </li>
       </ul>

@@ -248,6 +248,10 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
       APP.db.add("server", $scope.settings_server);
       APP.db.add("api_key", $scope.settings_api_key);
       $scope.toggleSettings();
+      if($scope.show_issues)
+        $scope.loadMyIssues();
+      if($scope.show_projects)
+        $scope.loadProjects();
     }
     $scope.restoreState = function(){
         $scope.settings_server = APP.db.get("server");
@@ -360,7 +364,7 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
     }
 
     $scope.show_issues = true;
-    $scope.show_projects = true;
+    $scope.show_projects = false;
 
     $scope.issues_comment_message='';
     $scope.issues_update_message= '';
@@ -370,7 +374,6 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
     $scope.projects_add_project = false;
     $scope.projects_parent_name = "";
     $scope.projects_parent_id = 0;
-    $scope.loadProjects();
     $scope.is_searching = false;
     $scope.search_count = 0;
     $scope.issues_message = '';
@@ -381,7 +384,12 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
     $scope.restoreState();
     if(!$scope.haveServerDetails())
       $scope.notifiyNoServerDetails();
-    else
-      $scope.loadMyIssues();
+    else{
+      if($scope.show_issues)
+        $scope.loadMyIssues();
+      if($scope.show_projects)
+        $scope.loadProjects();
+    }
+
   }]);
 
