@@ -106,16 +106,21 @@ class Issue
 		return $output;
 	}
 
-	public static function addUpdate($client, $id, $message, $private, $extra = null)
+	public static function addUpdate($client, $id, $message)
 	{
-		// $id_str = 'issue_id';
-		// if($project) $id_str = "project_id";
-		// if(!is_numeric($hours)) $hours = 0;
-		// if(!is_array($other_data)) $other_data = array();
-		// $other_data[$id_str] = $id;
-		// $other_data['hours'] = $hours;
-		// $other_data['comments'] = $comment;
-		// return @$client->api('time_entry')->create($other_data); // weird xml warning
+		$data = array('notes'=> $message);
+
+		return $client->api('issue')->update($id, $data);
+	}
+	public static function add($client, $project_id, $subject, $description){
+		$data = array(
+		    'project_id'     => $project_id,
+		    'subject'        => $subject,
+		    'description'    => $description,
+		    # 'assigned_to_id' => $userId
+	    );
+
+		return $client->api('issue')->create($data);
 	}
 }
 
@@ -208,16 +213,25 @@ function processIssues($action)
 		case "add":
 			addIssueWrapper();
 			break;
+		case "addUpdate":
+			addUpdateWrapper();
+			break;
 	}
 }
 
+
 function addIssueWrapper()
 {
-	$name = Utils::getArrayValue($_POST,'name');
-	$identifier = Utils::getArrayValue($_POST,'identifier');
-	$parent_id = Utils::getArrayValue($_POST,'parent_id');
-	if(trim($identifier) === "") $identifier = $name;
-	#addIssue(App::getClient(), $name, $identifier, $parent_id);
+	$project_id = Utils::getArrayValue($_POST,'project_id');
+	$subject = Utils::getArrayValue($_POST,'subject');
+	$description = Utils::getArrayValue($_POST,'description');
+	Issue::add(App::getClient(), $project_id, $subject, $description);
+}
+function addUpdateWrapper()
+{
+	$issue_id = Utils::getArrayValue($_POST,'issue_id');
+	$message = Utils::getArrayValue($_POST,'message');
+	Issue::addUpdate(App::getClient(), $issue_id, $message);
 }
 function getIssuesAllWrapper($mine = true)
 {
@@ -331,15 +345,15 @@ try
 	switch($mode)
 	{
 		case "projects":
-			processProjects($action, $id);
+			processProjects($action);
 			break;
 		case "issues":
-			processIssues($action, $id);
+			processIssues($action);
 			break;
 		case "logs":
 		case "timelogs":
 		case "time_entry":
-			processTimes($action, $id);
+			processTimes($action);
 			break;
 		default:
 			showTestPage();

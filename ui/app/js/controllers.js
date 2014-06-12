@@ -35,8 +35,12 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
     }
     $scope.serverDetails = function(){
       return "&server=" + encodeURIComponent(APP.db.get('server')) 
-            + "&api_key=" + encodeURIComponent(APP.db.get('api_key')) ;
+            + "&api_key=" + encodeURIComponent(APP.db.get('api_key')) 
+            + "&key=" + encodeURIComponent(APP.db.get('api_key')) 
+            ;
     }
+    $scope.getServer = function(){ return APP.db.get('server'); }
+    $scope.getAPIKey = function(){ return APP.db.get('api_key'); }
 
     $scope.cancelSearch = function(){
       $scope.is_searching = false;
@@ -58,6 +62,16 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
     $scope.loadProjects = function(){
       $scope.issues_message = 'loading...';
       if(!$scope.haveServerDetails()) { $scope.notifiyNoServerDetails(); return; }
+      
+      // $http.jsonp($scope.getServer() + '/projects.json?callback=JSON_CALLBACK' + $scope.serverDetails())
+      //   .success(function(data) {
+      //     $scope.issues_message = '';
+      //     $scope.projects = data['projects'];
+      //   })
+      //   .error(function(data,status){
+      //     alert('Failed: ' + status + ": " + data);
+      //   });
+
       $http.get('../../api/?mode=projects&action=all' + $scope.serverDetails())
         .success(function(data) {
           $scope.issues_message = '';
@@ -368,6 +382,7 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
 
     $scope.issues_comment_message='';
     $scope.issues_update_message= '';
+    $scope.projects = [];
     $scope.projects_issue_message='';
     $scope.projects_message = '';
     $scope.add_project = false;

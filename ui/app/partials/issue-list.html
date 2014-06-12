@@ -43,10 +43,10 @@
               <!-- <button class="btn" ng-click="addCommentAndClose()">Comment & Close</button> -->
           </form>          
         </div>
-        <div class='issue_update section' ng-show="false && selectedIssue != null">
+        <div class='issue_update section' ng-show="selectedIssue != null">
           <form class="form-inline" role="form">
             <textarea ng-model="issue_update_message" placeholder="Update Message"></textarea>
-            <label class="checkbox-inline">Private? <input type="checkbox" ng-model="issue_update_private"></label>
+            <label class="checkbox-inline" ng-show="false">Private? <input type="checkbox" ng-model="issue_update_private"></label>
             <button class="btn" ng-click="addIssueUpdate()">Add Update</button>
             <button class="btn btn-info btn-small" ng-show="issues_update_message != ''">{{issues_update_message}}</button>
           </form>
@@ -145,7 +145,7 @@
           <div class="btn-group">
             <button class="btn btn-primary btn-small" ng-click="selectProjectRow(row)">Start Work</button>
             <button ng-show="false" class="btn btn-small" ng-click="selectProjectToAddSubProject(row)">+ Sub Project</button>
-            <button ng-show="false" class="btn btn-info btn-small" ng-click="selectProjectToAddIssue(row)">+ Issue</button>
+            <button class="btn btn-info btn-small" ng-click="selectProjectToAddIssue(row)">+ Issue</button>
           </div>
         </li>
       </ul>
