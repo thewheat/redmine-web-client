@@ -72,6 +72,10 @@ class Project
 	{
 		return $client->api('membership')->all($project_id);
 	}
+	public static function addMembers($client, $project_id, $data_array)
+	{
+		return $client->api('membership')->create($projectId, $data_array);		
+	}
 	public static function getPriorities($client){
 		return $client->api('issue_priority')->all();
 	}
@@ -81,7 +85,7 @@ class Project
 	public static function getTrackers($client){
 		return $client->api('tracker')->all();
 	}
-	
+
 
 }
 
@@ -212,6 +216,24 @@ function addProjectWrapper()
 	$parent_id = Utils::getArrayValue($_POST,'parent_id');
 	if(trim($identifier) === "") $identifier = $name;
 	Project::add(App::getClient(), $name, $identifier, $parent_id);
+
+	// TODO: inherit membership
+	// $members = Project::getMembers(App::getClient(), 17);
+	// echo "<PRE>";
+	// print_r($members);
+
+	// echo "<HR>";
+	// $members = Project::getMembers(App::getClient(), 223);
+	// print_r($members);
+
+	// #$members = Project::addMembers(App::getClient(), 223, array('user_id'));
+	// #print_r($members);
+
+	// echo "<HR>";
+	// $members = Project::getMembers(App::getClient(), 223);
+	// print_r($members);
+	// die;
+
 }
 function getProjectsAllWrapper()
 {
@@ -295,7 +317,6 @@ function addUpdateWrapper()
 }
 function getIssuesAllWrapper($mine = true)
 {
-	$query_params = array();
 	$data = Issue::getAll(App::getClient(), $mine, "", null);
 	print(json_encode($data));
 }

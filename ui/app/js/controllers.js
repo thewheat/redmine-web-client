@@ -16,8 +16,10 @@ APP.db = (function(){
     if(!supports_html5_storage()) return;
     localStorage[key] = value;
   }
-  function get(key){
+  function get(key, defaultValue){
     if(!supports_html5_storage()) return "";
+    console.log(key, localStorage[key]);
+    if(localStorage[key] == null) return defaultValue;
     return localStorage[key];
   }
 
@@ -107,16 +109,6 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
     $scope.loadProjects = function(){
       $scope.issues_message = 'loading...';
       if(!$scope.haveServerDetails()) { $scope.notifiyNoServerDetails(); return; }
-      
-      // $http.jsonp($scope.getServer() + '/projects.json?callback=JSON_CALLBACK' + $scope.serverDetails())
-      //   .success(function(data) {
-      //     $scope.issues_message = '';
-      //     $scope.projects = data['projects'];
-      //   })
-      //   .error(function(data,status){
-      //     alert('Failed: ' + status + ": " + data);
-      //   });
-
       $http.get('../../api/?mode=projects&action=all' + $scope.serverDetails())
         .success(function(data) {
           $scope.issues_message = '';
@@ -326,10 +318,15 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
     }
 
 
+    $scope.toggleIssues = function(show){
+      if(!$scope.issues || $scope.issues.length == 0)
+        $scope.loadMyIssues();
+      APP.db.add("show_issues", $scope.show_issues);
+    }
     $scope.toggleProjects = function(){
-      $scope.show_projects = !$scope.show_projects;
       if(!$scope.projects || $scope.projects.length == 0)
         $scope.loadProjects();
+      APP.db.add("show_projects", $scope.show_projects);
     }
     $scope.selectProjectToAddSubProject = function(row){
       $scope.projects_add_project = true;
@@ -369,6 +366,7 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
           if(typeof(onsuccess)=="function") onsuccess();
           else {
             $scope.projects_message = 'Added';
+            alert("Note: You will need to manually specify inherit members");
           }
         })
         .error(function(data,status){
@@ -432,8 +430,9 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
       $scope.add_project = !$scope.add_project;
     }
 
-    $scope.show_issues = true;
-    $scope.show_projects = false;
+
+    $scope.show_issues = ("true" == APP.db.get("show_issues","true"));
+    $scope.show_projects = ("true" == APP.db.get("show_projects","true"));
 
     $scope.issues_comment_message='';
     $scope.issues_update_message= '';
@@ -441,6 +440,7 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
     $scope.projects_issue_message='';
     $scope.projects_message = '';
     $scope.add_project = false;
+    $scope.add_comment_message = '';
     $scope.projects_add_project = false;
     $scope.projects_parent_name = "";
     $scope.projects_parent_id = 0;
@@ -448,12 +448,11 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
     $scope.project_statuses = [];
     $scope.project_priorities = [];
     $scope.project_trackers = [];
-    $scope.loadProjectPriorities();
-    $scope.loadProjectMembers(73);
     $scope.is_searching = false;
     $scope.search_count = 0;
     $scope.issues_message = '';
     $scope.query = '';
+    $scope.query_projects = '';
     $scope.showSettings = false;
     $scope.clearSelected();
     $scope.resetTimer();

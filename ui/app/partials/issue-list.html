@@ -30,16 +30,10 @@
         <div class='comment section' ng-show="selectedIssue != null || selectedProject != null">
           <form class="form-inline" role="form">
             <input ng-model="time_comment" placeholder="Comment here">
-            <!--
-            Work Type:
-            <select ng-model="time_work">
-              <option value="work">work</option>
-              <option value="age"></option>
-            </select>
-            -->
+            <div class="btn-group">
               <button class="btn" ng-click="addComment()">Comment</button>
-              <!-- <button class="btn" ng-click="addLog()">Comment</button> -->
-              <!-- <button class="btn" ng-click="addCommentAndClose()">Comment & Close</button> -->
+              <button class='btn message' ng-show="addCommentMessage != ''">{{add_comment_message}}</button>
+            </div>
           </form>          
         </div>
         <div class='issue_update section' ng-show="selectedIssue != null">
@@ -56,11 +50,27 @@
             <h4><a href="{{settings_server}}/projects/{{projects_parent_id}}" target="_blank">{{projects_parent_name}} ({{projects_parent_id}})</a></h4>
             <input ng-model="issue_subject" placeholder="Subject">
             <div><textarea placeholder="Description" ng-model="issue_description"></textarea></div>
-            <div><label class="">Assignee <select ng-model="issue_assignee" ng-options="item.user.id as item.user.name for item in project_members"><option value="">Select Assignee</option></select></label></div>
-            <div><label class="">Priority <select ng-model="issue_priority" ng-options="item.id as item.name for item in project_priorities"><option value=""></option></select></label></div>
-            <div><label class="">Status <select ng-model="issue_status" ng-options="item.id as item.name for item in project_statuses"><option value=""></option></select></label></div>
-            <div><label class="">Tracker <select ng-model="issue_tracker" ng-options="item.id as item.name for item in project_trackers"><option value=""></option></select></label></div>
-            <label class="checkbox-inline">Private? <input type="checkbox" ng-model="issue_private"></label>
+            <div><label class="">
+                <select ng-model="issue_assignee">
+                  <option value="">--Select Assignee--</option>
+                  <option ng-repeat="item in project_members" value="{{item.user.id}}">{{item.user.name}}</option>  
+                </select></label></div> 
+            <div><label class=""> 
+              <select ng-model="issue_priority">
+                <option value="">--Select Priority--</option>
+                <option ng-repeat="item in project_priorities" value="{{item.id}}">{{item.name}}</option>
+              </select></label></div>
+            <div><label class=""> 
+              <select ng-model="issue_status">
+                <option value="">--Select Status--</option>
+                <option ng-repeat="item in project_statuses" value="{{item.id}}">{{item.name}}</option>
+              </select></label></div>
+            <div><label class="">
+              <select ng-model="issue_tracker">
+                <option value="">--Select Tracker--</option>
+                <option ng-repeat="item in project_trackers" value="{{item.id}}">{{item.name}}</option>
+              </select></label></div>
+            <!-- <label class="checkbox-inline">Private? <input type="checkbox" ng-model="issue_private"></label> -->
             <div class="btn-group">
               <button class="btn btn-primary" ng-click="addIssue()">Add Issue</button>
               <button class="btn btn-danger" ng-click="clearAddIssue()">Cancel</button>
@@ -76,6 +86,7 @@
         <form class="form-inline" role="form">
           <span ng-show="show_issues">
             <input ng-model="query" placeholder='Search Issues'>
+            <button class="btn btn-danger" ng-click="query = ''" ng-show="query != ''">x</button>
             <button class="btn" ng-click="loadMyIssues()">Reload My Issues</button>
             <button class="btn" ng-click="loadSearchIssues()">Search Issues</button>
           </span>
@@ -84,8 +95,8 @@
             <button class="btn btn-info btn-small" ng-show="issues_message != ''">{{issues_message}}</button>
             <button class='btn btn-danger' ng-click="cancelSearch()" ng-show="is_searching">Cancel</button>
           </span>
-          <label class="checkbox-inline">Issues <input type="checkbox" ng-model="show_issues"></label>
-          <label class='checkbox-inline'>Projects<input type="checkbox" ng-model="show_projects"></label>
+          <label class="checkbox-inline">Issues <input type="checkbox" ng-model="show_issues" ng-change="toggleIssues()"></label>
+          <label class='checkbox-inline'>Projects<input type="checkbox" ng-model="show_projects" ng-change="toggleProjects()"></label>
         </form>
 
         <div ng-show="showSettings">
@@ -104,7 +115,7 @@
     </div>
   </div>
   <div class="row-fluid">
-    <div class="span8" ng-show="show_issues">
+    <div class="span7" ng-show="show_issues">
       <ul class="issues">
         <li class="issue priority{{row.priority.name}} status{{row.status.name}}" 
             ng-repeat="row in myissues | filter:query">
@@ -119,9 +130,10 @@
         </li>
       </ul>
     </div>
-    <div class="span4" ng-show="show_projects">
+    <div class="span5" ng-show="show_projects">
         <form class="form-inline section" role="form" ng-show="show_projects" >
           <input ng-model="query_projects" placeholder='Search Projects'>
+          <button class="btn btn-danger" ng-click="query_projects = ''" ng-show="query_projects != ''">x</button>
           <button class="btn" ng-click="loadProjects()" ng-show="show_projects">Refresh</button>
           <button class="btn" ng-click="toggleAddProject()" ng-show="false && !add_project">+ Project</button>
         </form>
@@ -147,7 +159,7 @@
           <a href="{{settings_server}}/projects/{{row.id}}" target="_blank">{{row.parent.name}} <span ng-show="row.parent != null"> - </span>{{row.name}}</a>
           <div class="btn-group">
             <button class="btn btn-primary btn-small" ng-click="selectProjectRow(row)">Start Work</button>
-            <button ng-show="false" class="btn btn-small" ng-click="selectProjectToAddSubProject(row)">+ Sub Project</button>
+            <button class="btn btn-small" ng-click="selectProjectToAddSubProject(row)">+ Sub Project</button>
             <button class="btn btn-info btn-small" ng-click="selectProjectToAddIssue(row)">+ Issue</button>
           </div>
         </li>
