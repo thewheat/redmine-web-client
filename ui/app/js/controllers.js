@@ -178,7 +178,7 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
         .success(function(data) {
           if(typeof(onsuccess)=="function") onsuccess();
           else {
-            $scope.timerMessage = 'Added';
+            $scope.timer_message = 'Added';
           }
         })
         .error(function(data,status){
@@ -188,10 +188,14 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
     }
 
     $scope.addComment = function(hours){
+      var successComment = function(data){
+        $scope.issues_comment_message = 'Added';
+      }
+      $scope.issues_comment_message = 'Adding...';
       if($scope.selectedIssue)
-        $scope.logTimeEntry($scope.selectedIssue.id, 0.001, $scope.time_comment, false);
+        $scope.logTimeEntry($scope.selectedIssue.id, 0.001, $scope.time_comment, false,successComment);
       else if($scope.selectedProject)
-        $scope.logTimeEntry($scope.selectedProject.id, 0.001, $scope.time_comment, true);
+        $scope.logTimeEntry($scope.selectedProject.id, 0.001, $scope.time_comment, true,successComment);
     }
     $scope.addTime = function(hours){
       if($scope.selectedIssue)
@@ -214,7 +218,7 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
         $scope.timerObject = $timeout($scope.tick ,100); 
     };
     $scope.startTimer = function(){ 
-      $scope.timerMessage = '';
+      $scope.timer_message = '';
       $scope.timerEnabled = true;
       if(!$scope.timerObject){
         $scope.timerStart = (new Date()).getTime();
@@ -228,7 +232,7 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
     $scope.toggleTimer = function(){ 
       $scope.timerEnabled = !$scope.timerEnabled;
       if($scope.timerEnabled){
-        $scope.timerMessage = '';
+        $scope.timer_message = '';
         $scope.timerStart = (new Date()).getTime();
         console.log("start   : " + $scope.timerStart);
         console.log("  offset: " + $scope.timerStartOffet);
@@ -236,7 +240,7 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
         $scope.timerObject = $timeout($scope.tick ,100); 
       }
       else{
-        $scope.timerMessage = 'Logging Time';
+        $scope.timer_message = 'Logging Time';
         $scope.addTime($scope.timerCount/36000.0);
         console.log("stop        : " + $scope.timerStart);
         console.log("  old offset: " + $scope.timerStartOffet);
@@ -247,7 +251,7 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
       }
     }
     $scope.resetTimer = function(){ 
-      $scope.timerMessage = '';
+      $scope.timer_message = '';
       $scope.timerObject = null;
       $scope.timerCount = 0;
       $scope.timerEnabled = false;
@@ -437,6 +441,8 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
     $scope.issues_comment_message='';
     $scope.issues_update_message= '';
     $scope.projects = [];
+    $scope.time_comment = '';
+    $scope.issue_update_message = '';
     $scope.projects_issue_message='';
     $scope.projects_message = '';
     $scope.add_project = false;
