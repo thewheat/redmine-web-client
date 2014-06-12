@@ -66,7 +66,23 @@ class Project
 		);
 		if(intval($parent_id) > 0) $data['parent_id'] = $parent_id;
 		return $client->api('project')->create($data);
-	}	
+	}
+
+	public static function getMembers($client, $project_id)
+	{
+		return $client->api('membership')->all($project_id);
+	}
+	public static function getPriorities($client){
+		return $client->api('issue_priority')->all();
+	}
+	public static function getStatuses($client){
+		return $client->api('issue_status')->all();
+	}
+	public static function getTrackers($client){
+		return $client->api('tracker')->all();
+	}
+	
+
 }
 
 
@@ -109,20 +125,23 @@ class Issue
 	public static function addUpdate($client, $id, $message)
 	{
 		$data = array('notes'=> $message);
-
 		return $client->api('issue')->update($id, $data);
 	}
-	public static function add($client, $project_id, $subject, $description){
+	public static function add($client, $project_id, $subject, $description, $user_id, $status_id, $priority_id, $tracker_id){
 		$data = array(
 		    'project_id'     => $project_id,
 		    'subject'        => $subject,
 		    'description'    => $description,
-		    # 'assigned_to_id' => $userId
+		    'assigned_to_id' => $user_id,
+		    'status_id' => $status_id,
+		    'priority_id' => $priority_id,
+		    'tracker_id' => $tracker_id
 	    );
 
 		return $client->api('issue')->create($data);
 	}
 }
+
 
 
 class TimeLog
@@ -170,6 +189,18 @@ function processProjects($action)
 		case "add":
 			addProjectWrapper();
 			break;
+		case "members":
+			getProjectsMembersWrapper();
+			break;
+		case "priorities":
+			getProjectsPrioritiesWrapper();
+			break;
+		case "trackers":
+			getProjectsTrackersWrapper();
+			break;
+		case "statuses":
+			getProjectsStatusesWrapper();
+			break;
 	}
 }
 
@@ -185,6 +216,29 @@ function addProjectWrapper()
 function getProjectsAllWrapper()
 {
 	$data = Project::getAll(App::getClient());
+	print(json_encode($data));
+}
+function getProjectsTrackersWrapper()
+{
+	$data = Project::getTrackers(App::getClient());
+	print(json_encode($data));
+}
+function getProjectsPrioritiesWrapper()
+{
+	$data = Project::getPriorities(App::getClient());
+	print(json_encode($data));
+}
+function getProjectsStatusesWrapper()
+{
+	$data = Project::getStatuses(App::getClient());
+	print(json_encode($data));
+}
+function getProjectsMembersWrapper()
+{
+	$project_id = Utils::getArrayValue($_GET,'project_id');
+	$data = Project::getMembers(App::getClient(), $project_id);
+
+	App::getClient()->api('membership')->all('client-access');
 	print(json_encode($data));
 }
 function getProjectsPagedWrapper()
@@ -225,7 +279,13 @@ function addIssueWrapper()
 	$project_id = Utils::getArrayValue($_POST,'project_id');
 	$subject = Utils::getArrayValue($_POST,'subject');
 	$description = Utils::getArrayValue($_POST,'description');
-	Issue::add(App::getClient(), $project_id, $subject, $description);
+
+	$status_id = Utils::getArrayValue($_POST,'status_id');
+	$tracker_id = Utils::getArrayValue($_POST,'tracker_id');
+	$user_id = Utils::getArrayValue($_POST,'assigned_to_id');
+	$priority_id = Utils::getArrayValue($_POST,'priority_id');
+
+	Issue::add(App::getClient(), $project_id, $subject, $description, $user_id, $status_id, $priority_id, $tracker_id);
 }
 function addUpdateWrapper()
 {

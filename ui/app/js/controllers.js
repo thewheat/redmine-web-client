@@ -59,6 +59,51 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
           alert('Failed: ' + status + ": " + data);
         });
     }
+    $scope.loadProjectMembers = function($project_id){
+      if(!$scope.haveServerDetails()) { $scope.notifiyNoServerDetails(); return; }
+      $scope.project_members = [];
+      $http.get('../../api/?mode=projects&action=members&project_id=' + $project_id + $scope.serverDetails())
+        .success(function(data) {
+          $scope.project_members = data['memberships'];
+        })
+        .error(function(data,status){
+          alert('Failed: ' + status + ": " + data);
+        });
+    }
+
+    $scope.loadProjectStatuses = function($project_id){
+      if(!$scope.haveServerDetails()) { $scope.notifiyNoServerDetails(); return; }
+      $scope.project_statuses = [];
+      $http.get('../../api/?mode=projects&action=statuses&project_id=' + $project_id + $scope.serverDetails())
+        .success(function(data) {
+          $scope.project_statuses = data['issue_statuses'];
+        })
+        .error(function(data,status){
+          alert('Failed: ' + status + ": " + data);
+        });
+    }
+    $scope.loadProjectTrackers = function($project_id){
+      if(!$scope.haveServerDetails()) { $scope.notifiyNoServerDetails(); return; }
+      $scope.project_trackers = [];
+      $http.get('../../api/?mode=projects&action=trackers&project_id=' + $project_id + $scope.serverDetails())
+        .success(function(data) {
+          $scope.project_trackers = data['trackers'];
+        })
+        .error(function(data,status){
+          alert('Failed: ' + status + ": " + data);
+        });
+    }
+    $scope.loadProjectPriorities = function($project_id){
+      if(!$scope.haveServerDetails()) { $scope.notifiyNoServerDetails(); return; }
+      $scope.project_priorities = [];
+      $http.get('../../api/?mode=projects&action=priorities&project_id=' + $project_id + $scope.serverDetails())
+        .success(function(data) {
+          $scope.project_priorities = data['issue_priorities'];
+        })
+        .error(function(data,status){
+          alert('Failed: ' + status + ": " + data);
+        });
+    }
     $scope.loadProjects = function(){
       $scope.issues_message = 'loading...';
       if(!$scope.haveServerDetails()) { $scope.notifiyNoServerDetails(); return; }
@@ -290,12 +335,16 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
       $scope.projects_add_project = true;
       $scope.add_project = true;
       $scope.projects_parent_name = row.name;
-      $scope.projects_parent_id = row.id;
+      $scope.projects_parent_id = row.id;      
     }
     $scope.selectProjectToAddIssue = function(row){
       $scope.projects_add_issue = true;
       $scope.projects_parent_name = row.name;
       $scope.projects_parent_id = row.id;
+      $scope.loadProjectPriorities(row.id);
+      $scope.loadProjectMembers(row.id);
+      $scope.loadProjectStatuses(row.id)
+      $scope.loadProjectTrackers(row.id)
     }
     $scope.clearAddIssue = function(){
       $scope.projects_add_issue = false;
@@ -356,7 +405,13 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
       var inputData = {
         project_id: $scope.projects_parent_id,
         subject: $scope.issue_subject,
-        description: $scope.issue_description
+        description: $scope.issue_description,
+        priority_id: $scope.issue_priority,
+        assigned_to_id: $scope.issue_assignee,
+        tracker_id: $scope.issue_tracker,
+        status_id: $scope.issue_status,
+        private: $scope.issue_private,
+
       }
       $http.post('../../api/?mode=issues&action=add' + $scope.serverDetails(), inputData)
         .success(function(data) {
@@ -389,6 +444,12 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
     $scope.projects_add_project = false;
     $scope.projects_parent_name = "";
     $scope.projects_parent_id = 0;
+    $scope.project_members = [];
+    $scope.project_statuses = [];
+    $scope.project_priorities = [];
+    $scope.project_trackers = [];
+    $scope.loadProjectPriorities();
+    $scope.loadProjectMembers(73);
     $scope.is_searching = false;
     $scope.search_count = 0;
     $scope.issues_message = '';

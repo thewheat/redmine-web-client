@@ -1,7 +1,6 @@
 <div class="container-fluid">
   <div class="row-fluid">
     <div class='action'>
-
         <div class='issue brief' ng-show="selectedIssue != null">
           <h4><a href="{{settings_server}}/issues/{{selectedIssue.id}}" target="_blank">#{{selectedIssue.id}} : {{selectedIssue.subject}}</a></h4>
           <h5><a href="{{settings_server}}/projects/{{selectedIssue.project.id}}" target="_blank">{{selectedIssue.project.name}}</a> - {{selectedIssue.assigned_to.name}}</h5>
@@ -57,6 +56,10 @@
             <h4><a href="{{settings_server}}/projects/{{projects_parent_id}}" target="_blank">{{projects_parent_name}} ({{projects_parent_id}})</a></h4>
             <input ng-model="issue_subject" placeholder="Subject">
             <div><textarea placeholder="Description" ng-model="issue_description"></textarea></div>
+            <div><label class="">Assignee <select ng-model="issue_assignee" ng-options="item.user.id as item.user.name for item in project_members"><option value="">Select Assignee</option></select></label></div>
+            <div><label class="">Priority <select ng-model="issue_priority" ng-options="item.id as item.name for item in project_priorities"><option value=""></option></select></label></div>
+            <div><label class="">Status <select ng-model="issue_status" ng-options="item.id as item.name for item in project_statuses"><option value=""></option></select></label></div>
+            <div><label class="">Tracker <select ng-model="issue_tracker" ng-options="item.id as item.name for item in project_trackers"><option value=""></option></select></label></div>
             <label class="checkbox-inline">Private? <input type="checkbox" ng-model="issue_private"></label>
             <div class="btn-group">
               <button class="btn btn-primary" ng-click="addIssue()">Add Issue</button>
