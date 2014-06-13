@@ -179,6 +179,7 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
           if(typeof(onsuccess)=="function") onsuccess();
           else {
             $scope.timer_message = 'Added';
+            $scope.time_comment = '';
           }
         })
         .error(function(data,status){
@@ -190,6 +191,7 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
     $scope.addComment = function(hours){
       var successComment = function(data){
         $scope.issues_comment_message = 'Added';
+        $scope.time_comment = '';
       }
       $scope.issues_comment_message = 'Adding...';
       if($scope.selectedIssue)
@@ -199,9 +201,9 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
     }
     $scope.addTime = function(hours){
       if($scope.selectedIssue)
-        $scope.logTimeEntry($scope.selectedIssue.id, hours,'', false);
+        $scope.logTimeEntry($scope.selectedIssue.id, hours,$scope.time_comment, false);
       else if($scope.selectedProject)
-        $scope.logTimeEntry($scope.selectedProject.id, hours,'', true);
+        $scope.logTimeEntry($scope.selectedProject.id, hours,$scope.time_comment, true);
     }
     $scope.tick = function(){
         if(!$scope.timerEnabled) {
