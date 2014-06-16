@@ -137,7 +137,7 @@
           <input ng-model="query_projects" placeholder='Search Projects'>
           <button class="btn btn-danger" ng-click="query_projects = ''" ng-show="query_projects != ''">x</button>
           <button class="btn" ng-click="loadProjects()" ng-show="show_projects">Refresh</button>
-          <button class="btn" ng-click="toggleAddProject()" ng-show="false && !add_project">+ Project</button>
+          <button class="btn" ng-click="toggleAddProject()">+ Project</button>
         </form>
         <div class='project section'  ng-show="add_project">
           <h3>Add Project</h3>
