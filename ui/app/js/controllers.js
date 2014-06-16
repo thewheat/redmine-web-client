@@ -344,6 +344,7 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
       $scope.projects_add_issue = true;
       $scope.projects_parent_name = row.name;
       $scope.projects_parent_id = row.id;
+
       $scope.loadProjectPriorities(row.id);
       $scope.loadProjectMembers(row.id);
       $scope.loadProjectStatuses(row.id)
@@ -352,6 +353,20 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
     $scope.clearAddIssue = function(){
       $scope.projects_add_issue = false;
       $scope.projects_issue_message='';
+    }
+    $scope.clearAddIssueFields = function(){
+      $scope.projects_add_issue = false;
+      $scope.projects_issue_message='';
+      $scope.projects_parent_name = "";
+      $scope.projects_parent_id = "";
+      $scope.issue_subject = "";
+      $scope.issue_description = "";
+      $scope.issue_priority = "";
+      $scope.issue_assignee = "";
+      $scope.issue_tracker = "";
+      $scope.issue_status = "";
+      $scope.issue_private = "";
+
     }
     $scope.clearProject = function(){
       $scope.projects_parent_name = "";
@@ -423,6 +438,8 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
           if(typeof(onsuccess)=="function") onsuccess();
           else {
             $scope.projects_issue_message = 'Added';
+            $scope.clearAddIssueFields();
+            $scope.clearAddIssue();
           }
         })
         .error(function(data,status){
