@@ -148,13 +148,11 @@
               <button class="btn btn-danger" ng-click="clearProject()">X</button>
             </div>
             <input ng-model="project_name" placeholder="Project name">
-            <div class="btn-group">
               <button class="btn btn-primary" ng-click="addProject()">Add Project</button>
               <button class="btn btn-danger" ng-click="toggleAddProject()">Cancel</button>
-            </div>
+              <button class="btn btn-info btn-small" ng-show="projects_message != ''">{{projects_message}}</button>
           </form>
         </div>
-        <button class="btn btn-info btn-small" ng-show="projects_message != ''">{{projects_message}}</button>
 
       <ul class="projects">
         <li class="project" 
