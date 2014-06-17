@@ -410,6 +410,7 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
           if(typeof(onsuccess)=="function") onsuccess();
           else {
             $scope.issues_update_message = 'Added';
+            $scope.issue_update_message = '';
           }
         })
         .error(function(data,status){
