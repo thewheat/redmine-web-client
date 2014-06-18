@@ -112,7 +112,7 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
       $http.get('../../api/?mode=projects&action=all' + $scope.serverDetails())
         .success(function(data) {
           $scope.issues_message = '';
-          $scope.projects = data['projects'];
+          $scope.projects = data['projects'].filter(function(item){return item.status == "1"});
         })
         .error(function(data,status){
           alert('Failed: ' + status + ": " + data);
