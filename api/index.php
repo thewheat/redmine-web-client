@@ -307,13 +307,13 @@ function addIssueWrapper()
 	$user_id = Utils::getArrayValue($_POST,'assigned_to_id');
 	$priority_id = Utils::getArrayValue($_POST,'priority_id');
 
-	Issue::add(App::getClient(), $project_id, $subject, $description, $user_id, $status_id, $priority_id, $tracker_id);
+	print(json_encode(Issue::add(App::getClient(), $project_id, $subject, $description, $user_id, $status_id, $priority_id, $tracker_id)));
 }
 function addUpdateWrapper()
 {
 	$issue_id = Utils::getArrayValue($_POST,'issue_id');
 	$message = Utils::getArrayValue($_POST,'message');
-	Issue::addUpdate(App::getClient(), $issue_id, $message);
+	print(json_encode(Issue::addUpdate(App::getClient(), $issue_id, $message)));
 }
 function getIssuesAllWrapper($mine = true)
 {

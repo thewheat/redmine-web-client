@@ -94,10 +94,9 @@
             <button class="btn" ng-click="loadSearchIssues()">Search All Issues</button>
           </span>
           <button class="btn" ng-click="toggleSettings()">Settings</button>
-          <span ng-show="show_issues">
-            <button class="btn btn-info btn-small" ng-show="issues_message != ''">{{issues_message}}</button>
-            <button class='btn btn-danger' ng-click="cancelSearch()" ng-show="is_searching">Cancel</button>
-          </span>
+          <button class="btn btn-info btn-small" ng-show="global_message != ''">{{global_message}}</button>
+          <span class="" ng-show="global_url.url != ''"><a href='{{global_url.url}}' target="_blank">{{global_url.text}}</a></span>
+          <button class='btn btn-danger' ng-click="cancelSearch()" ng-show="is_searching">Cancel</button>
           <label class="checkbox-inline">Issues <input type="checkbox" ng-model="show_issues" ng-change="toggleIssues()"></label>
           <label class='checkbox-inline'>Projects<input type="checkbox" ng-model="show_projects" ng-change="toggleProjects()"></label>
         </form>

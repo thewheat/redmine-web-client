@@ -44,17 +44,28 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
     $scope.getServer = function(){ return APP.db.get('server'); }
     $scope.getAPIKey = function(){ return APP.db.get('api_key'); }
 
+    $scope.setGlobalMessage = function(msg, extra) { 
+      if(!extra) extra  = {}
+      $scope.global_message = msg; 
+      $scope.global_url = {
+        url:  (typeof(extra.url) == "undefined" ? "" : extra.url),
+        text: (typeof(extra.text) == "undefined" ? msg : extra.text)
+      };
+    }
+
+    $scope.getIssueLink = function(id) { return $scope.getServer() + "/issues/" + id }
+
     $scope.cancelSearch = function(){
       $scope.is_searching = false;
       $scope.search_count++;
-      $scope.issues_message = 'Search cancelled';
+      $scope.setGlobalMessage('Search cancelled');
     }
     $scope.loadMyIssues = function(){
-      $scope.issues_message = 'loading...';
+      $scope.setGlobalMessage('loading...');
       if(!$scope.haveServerDetails()) { $scope.notifiyNoServerDetails(); return; }
       $http.get('../../api/?mode=issues&action=mine' + $scope.serverDetails())
         .success(function(data) {
-          $scope.issues_message = '';
+          $scope.setGlobalMessage('');
           $scope.myissues = data['issues'];
         })
         .error(function(data,status){
@@ -107,11 +118,11 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
         });
     }
     $scope.loadProjects = function(){
-      $scope.issues_message = 'loading...';
+      $scope.setGlobalMessage('loading...');
       if(!$scope.haveServerDetails()) { $scope.notifiyNoServerDetails(); return; }
       $http.get('../../api/?mode=projects&action=all' + $scope.serverDetails())
         .success(function(data) {
-          $scope.issues_message = '';
+          $scope.setGlobalMessage('');
           $scope.projects = data['projects'].filter(function(item){return item.status == "1"});
         })
         .error(function(data,status){
@@ -140,15 +151,15 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
       if($scope.search_count != count) return;
 
 
-      $scope.issues_message = 'loading...';
+      $scope.setGlobalMessage('loading...');
       if(offset != 0)
-        $scope.issues_message += ' (' + offset + '/' + $scope.issue_count + ')';
+        $scope.global_message += ' (' + offset + '/' + $scope.issue_count + ')';
 
       $http.get('../../api/?mode=issues&action=list&offset=' + offset +'&search=' + search + $scope.serverDetails())
         .success(function(data) {
           if($scope.search_count != count) return;
 
-          $scope.issues_message = '';
+          $scope.setGlobalMessage('');
           if(!offset)
           {
             $scope.myissues = data['issues'];
@@ -264,7 +275,7 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
       $scope.selectedIssue = null;
       $scope.selectedProject = null;
 
-      $scope.issues_message = '';
+      $scope.setGlobalMessage('');
       $scope.issues_update_message='';
       $scope.issues_comment_message='';
 
@@ -435,13 +446,19 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
       }
       $http.post('../../api/?mode=issues&action=add' + $scope.serverDetails(), inputData)
         .success(function(data) {
-          console.log(data);
-          if(typeof(onsuccess)=="function") onsuccess();
-          else {
-            $scope.projects_issue_message = 'Added';
-            $scope.clearAddIssueFields();
-            $scope.clearAddIssue();
+          if(data.error){
+            $scope.projects_message = 'ERROR: ' + data.error;
+            alert($scope.projects_message)
+            return;
           }
+          $scope.setGlobalMessage("Added", { 
+            url: $scope.getIssueLink(data.id),
+            text: "View Issue #" + data.id
+          }); 
+          $scope.projects_issue_message = "Added #" + data.id;
+          $scope.clearAddIssueFields();
+          $scope.clearAddIssue();
+
         })
         .error(function(data,status){
             $scope.projects_issue_message = 'Failed';
@@ -476,7 +493,7 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
     $scope.project_trackers = [];
     $scope.is_searching = false;
     $scope.search_count = 0;
-    $scope.issues_message = '';
+    $scope.setGlobalMessage('');
     $scope.query = '';
     $scope.query_projects = '';
     $scope.showSettings = false;
