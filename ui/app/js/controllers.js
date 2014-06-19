@@ -54,6 +54,7 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
     }
 
     $scope.getIssueLink = function(id) { return $scope.getServer() + "/issues/" + id }
+    $scope.getProjectLink = function(id) { return $scope.getServer() + "/projects/" + id }
 
     $scope.cancelSearch = function(){
       $scope.is_searching = false;
@@ -117,12 +118,14 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
           alert('Failed: ' + status + ": " + data);
         });
     }
-    $scope.loadProjects = function(){
-      $scope.setGlobalMessage('loading...');
+    $scope.loadProjects = function(hideLoadingMessage){
+      if(!hideLoadingMessage)
+        $scope.setGlobalMessage('loading...');
       if(!$scope.haveServerDetails()) { $scope.notifiyNoServerDetails(); return; }
       $http.get('../../api/?mode=projects&action=all' + $scope.serverDetails())
         .success(function(data) {
-          $scope.setGlobalMessage('');
+          if(!hideLoadingMessage)
+            $scope.setGlobalMessage('');
           $scope.projects = data['projects'].filter(function(item){return item.status == "1"});
         })
         .error(function(data,status){
@@ -387,19 +390,28 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
     $scope.addProject = function(){
       $scope.projects_message = 'adding...';
       if(!$scope.haveServerDetails()) { $scope.notifiyNoServerDetails(); return; }
+      if(!$scope.project_identifier) $scope.project_identifier = $scope.project_name.replace(/ /g,'-').replace(/\W+/g,'');
       var inputData = {
         name: $scope.project_name,
-        identifier: $scope.project_name,
+        identifier: $scope.project_identifier,
         parent_id: $scope.projects_parent_id
       }
       $http.post('../../api/?mode=projects&action=add' + $scope.serverDetails(), inputData)
         .success(function(data) {
-          console.log(data);
-          if(typeof(onsuccess)=="function") onsuccess();
-          else {
-            $scope.projects_message = 'Added';
-            alert("Note: You will need to manually specify inherit members");
+          if(data.error){
+            $scope.projects_message = 'ERROR: ' + data.error;
+            alert($scope.projects_message)
+            return;
           }
+          $scope.projects_message = 'Added';
+          $scope.loadProjects(true);
+          $scope.setGlobalMessage("Added", { 
+            url: $scope.getProjectLink(data.id),
+            text: "View Project " + data.name
+          }); 
+          alert("Note: You will need to manually specify inherit members");
+          $scope.clearAddProjectFields();
+          $scope.toggleAddProject();
         })
         .error(function(data,status){
           $scope.projects_message = 'Failed';
@@ -469,6 +481,13 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
     $scope.toggleAddProject = function()
     {
       $scope.add_project = !$scope.add_project;
+      if($scope.add_project) $scope.project_identifier = '';
+    }
+    $scope.clearAddProjectFields = function()
+    {
+      $scope.project_name = '';
+      $scope.project_identifier = '';
+      $scope.projects_parent_id = 0;
     }
 
 

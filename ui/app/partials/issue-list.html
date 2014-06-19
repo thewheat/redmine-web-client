@@ -146,7 +146,8 @@
               <button class="btn">{{projects_parent_name}} ({{projects_parent_id}})</button>
               <button class="btn btn-danger" ng-click="clearProject()">X</button>
             </div>
-            <input ng-model="project_name" placeholder="Project name">
+              <input ng-model="project_name" placeholder="Project name">
+              <input ng-model="project_identifier" ng-show="project_identifier != ''" placeholder="Project identifier (url name)">
               <button class="btn btn-primary" ng-click="addProject()">Add Project</button>
               <button class="btn btn-danger" ng-click="toggleAddProject()">Cancel</button>
               <button class="btn btn-info btn-small" ng-show="projects_message != ''">{{projects_message}}</button>

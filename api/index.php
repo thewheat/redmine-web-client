@@ -215,7 +215,7 @@ function addProjectWrapper()
 	if(empty($identifier)) $identifier = $name;
 	$parent_id = Utils::getArrayValue($_POST,'parent_id');
 	if(trim($identifier) === "") $identifier = $name;
-	Project::add(App::getClient(), $name, $identifier, $parent_id);
+	print(json_encode(Project::add(App::getClient(), $name, $identifier, $parent_id)));
 
 	// TODO: inherit membership
 	// $members = Project::getMembers(App::getClient(), 17);
