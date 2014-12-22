@@ -325,6 +325,10 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http', '$location'
     $scope.selectIssue = function(row){
       $scope.selectedProject = null;
       $scope.selectedIssue = row;
+      if($scope.settings_ckeditor && !CKEDITOR.instances['ckeditorUpdate'])
+        CKEDITOR.replace( 'ckeditorUpdate' );
+      else if(!$scope.settings_ckeditor && CKEDITOR.instances['ckeditorUpdate'])
+        CKEDITOR.instances['ckeditorUpdate'].destroy();
     }
     $scope.selectProject = function(row){
       $scope.selectedIssue = null;
@@ -356,6 +360,7 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http', '$location'
         $scope.settings_server = "http://"+$scope.settings_server;
       APP.db.add("server", $scope.settings_server);
       APP.db.add("api_key", $scope.settings_api_key);
+      APP.db.add("settings_ckeditor", $scope.settings_ckeditor);
       $scope.toggleSettings();
       if($scope.show_issues)
         $scope.loadMyIssues();
@@ -365,6 +370,8 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http', '$location'
     $scope.restoreState = function(){
         $scope.settings_server = APP.db.get("server");
         $scope.settings_api_key = APP.db.get("api_key");
+        $scope.settings_ckeditor = (APP.db.get("settings_ckeditor").match(/true/gi) ? true : false);
+
         // $scope.timerStartOffet = APP.db.get('count');
         // $scope.query = APP.db.get('query');
         // $scope.query = APP.db.get('selected_issue')
@@ -403,11 +410,18 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http', '$location'
       $scope.loadProjectStatuses(row.id)
       $scope.loadProjectTrackers(row.id)
 
+      if($scope.settings_ckeditor && !CKEDITOR.instances['ckeditor'])
+        CKEDITOR.replace( 'ckeditor' );
+      else if(!$scope.settings_ckeditor && CKEDITOR.instances['ckeditor'])
+        CKEDITOR.instances['ckeditor'].destroy();
       $scope.scrollTo('add-issue');
     }
     $scope.clearAddIssue = function(){
       $scope.projects_add_issue = false;
       $scope.projects_issue_message='';
+      if($scope.settings_ckeditor && CKEDITOR.instances['ckeditor'])
+        CKEDITOR.instances['ckeditorUpdate'].setData('');
+
     }
     $scope.clearAddIssueFields = function(){
       $scope.projects_add_issue = false;
@@ -421,6 +435,8 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http', '$location'
       $scope.issue_tracker = "";
       $scope.issue_status = "";
       $scope.issue_private = "";
+      if($scope.settings_ckeditor && CKEDITOR.instances['ckeditor'])
+        CKEDITOR.instances['ckeditor'].setData('');
 
     }
     $scope.clearProject = function(){
@@ -463,6 +479,9 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http', '$location'
     $scope.addIssueUpdate= function(){
       $scope.issues_update_message = 'adding...';
       if(!$scope.haveServerDetails()) { $scope.notifiyNoServerDetails(); return; }
+      if($scope.settings_ckeditor && CKEDITOR.instances['ckeditorUpdate']){
+        $scope.issue_update_message = CKEDITOR.instances['ckeditorUpdate'].getData();
+      }
       var inputData = {
         message: $scope.issue_update_message,
         private: $scope.issue_update_private,
@@ -485,6 +504,9 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http', '$location'
     }
     $scope.addIssue = function(){
       $scope.projects_issue_message = 'adding...';
+      if($scope.settings_ckeditor && CKEDITOR.instances['ckeditor']){
+        $scope.issue_description = CKEDITOR.instances['ckeditor'].getData();
+      }
       if(!$scope.haveServerDetails()) { $scope.notifiyNoServerDetails(); return; }
       var inputData = {
         project_id: $scope.projects_parent_id,
@@ -511,7 +533,7 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http', '$location'
           $scope.projects_issue_message = "Added #" + data.id;
           $scope.clearAddIssueFields();
           $scope.clearAddIssue();
-
+          $scope.scrollTo('header');
         })
         .error(function(data,status){
             $scope.projects_issue_message = 'Failed';
