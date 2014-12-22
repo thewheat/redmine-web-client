@@ -61,13 +61,36 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
       $scope.search_count++;
       $scope.setGlobalMessage('Search cancelled');
     }
+
+    // refresh my issues every x seconds
+    $scope.issueReloadTick = function(){
+        $scope.issueReloadCounter = parseInt($scope.issueReloadCounter);
+        if(isNaN($scope.issueReloadCounter)) $scope.issueReloadCounter = 0;
+        else
+          $scope.issueReloadCounter -= 1;
+        console.log($scope.issueReloadCounter);
+        if($scope.show_issues && $scope.is_searching_mine) {
+          if($scope.issueReloadCounter <= 0)
+            $scope.loadMyIssues();
+          else
+            $scope.issueReloadObject = $timeout($scope.issueReloadTick ,1000);
+        }
+        else
+            $scope.issueReloadObject = null;
+    }
+
     $scope.loadMyIssues = function(){
       $scope.setGlobalMessage('loading...');
+      $scope.is_searching_mine = true;
       if(!$scope.haveServerDetails()) { $scope.notifiyNoServerDetails(); return; }
       $http.get('../../api/?mode=issues&action=mine' + $scope.serverDetails())
         .success(function(data) {
           $scope.setGlobalMessage('');
           $scope.myissues = data['issues'];
+
+          $scope.issueReloadCounter = $scope.issueReloadInSeconds;
+          if($scope.issueReloadObject == null)
+            $scope.issueReloadObject = $timeout($scope.issueReloadTick ,1000);
         })
         .error(function(data,status){
           alert('Failed: ' + status + ": " + data);
@@ -134,6 +157,7 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
     }
     $scope.loadSearchIssues = function(offset, search, count){
       if(!$scope.haveServerDetails()) { $scope.notifiyNoServerDetails(); return; }
+      $scope.is_searching_mine = false;
       
       if(!offset) offset = 0;    
       offset = parseInt(offset);
@@ -511,6 +535,7 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
     $scope.project_priorities = [];
     $scope.project_trackers = [];
     $scope.is_searching = false;
+    $scope.is_searching_mine = false;
     $scope.search_count = 0;
     $scope.setGlobalMessage('');
     $scope.query = '';
@@ -519,6 +544,9 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
     $scope.clearSelected();
     $scope.resetTimer();
     $scope.restoreState();
+    $scope.issueReloadObject = null; // object to assign timer to
+    $scope.issueReloadInSeconds = 30; // max reload in seconds
+    $scope.issueReloadCounter = $scope.issueReloadInSeconds; // current count
     if(!$scope.haveServerDetails())
       $scope.notifiyNoServerDetails();
     else{
