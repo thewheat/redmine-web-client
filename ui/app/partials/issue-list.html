@@ -156,7 +156,7 @@
 
       <ul class="projects">
         <li class="project" 
-            ng-repeat="row in projects | filter:query_projects">
+            ng-repeat="row in projects | filter:searchProjectsFilter">
           <a href="{{settings_server}}/projects/{{row.id}}" target="_blank">{{row.parent.name}} <span ng-show="row.parent != null"> - </span>{{row.name}}</a>
           <div class="btn-group">
             <button class="btn btn-primary btn-small" ng-click="selectProjectRow(row)">Start Work</button>

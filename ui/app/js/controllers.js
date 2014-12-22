@@ -513,6 +513,21 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
       $scope.project_identifier = '';
       $scope.projects_parent_id = 0;
     }
+    $scope.searchProjectsFilter = function(element){
+      var name = '';
+      if(element.parent && element.parent.name)
+        name = element.parent.name + ' - ';
+      if(element.name)
+        name += element.name;
+      var search_terms = $scope.query_projects.split(" ");
+      var match = true;
+      for(var i = 0; i < search_terms.length; i++){
+        var regex = RegExp(search_terms[i], 'gi');
+        match = ((name.match(regex)) ? true : false);
+        if(!match) break;
+      }
+      return match;
+    }
 
 
     $scope.show_issues = ("true" == APP.db.get("show_issues","true"));
