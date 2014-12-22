@@ -30,8 +30,8 @@ APP.db = (function(){
 })();
 
 
-appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
-  function($scope, $timeout, $http) {
+appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http', '$location', '$anchorScroll',
+  function($scope, $timeout, $http, $location, $anchorScroll) {
     $scope.haveServerDetails = function(){
       return (APP.db.get('server') && APP.db.get('api_key'));
     }
@@ -264,6 +264,20 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
         $scope.timerStart = (new Date()).getTime();
         $scope.timerObject = $timeout($scope.tick ,100); 
       }
+      $scope.scrollTo('timer');
+    }
+
+    // prevent hash change from reloading view and controller
+    $scope.$on('$locationChangeStart', function(ev) {
+        ev.preventDefault();
+    });
+
+    // doesn't scroll if item is hidden
+    $scope.scrollTo = function(id){
+      $timeout(function(){
+        $location.hash(id);
+        $anchorScroll();
+      }, 100);
     }
     $scope.stopTimer = function(){ 
       $scope.timerEnabled = false;
@@ -376,7 +390,8 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
       $scope.projects_add_project = true;
       $scope.add_project = true;
       $scope.projects_parent_name = row.name;
-      $scope.projects_parent_id = row.id;      
+      $scope.projects_parent_id = row.id;
+      $scope.scrollTo('add-project');
     }
     $scope.selectProjectToAddIssue = function(row){
       $scope.projects_add_issue = true;
@@ -387,6 +402,8 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
       $scope.loadProjectMembers(row.id);
       $scope.loadProjectStatuses(row.id)
       $scope.loadProjectTrackers(row.id)
+
+      $scope.scrollTo('add-issue');
     }
     $scope.clearAddIssue = function(){
       $scope.projects_add_issue = false;
@@ -528,7 +545,6 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http',
       }
       return match;
     }
-
 
     $scope.show_issues = ("true" == APP.db.get("show_issues","true"));
     $scope.show_projects = ("true" == APP.db.get("show_projects","true"));
