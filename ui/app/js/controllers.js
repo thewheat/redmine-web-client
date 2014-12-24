@@ -370,7 +370,7 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http', '$location'
     $scope.restoreState = function(){
         $scope.settings_server = APP.db.get("server");
         $scope.settings_api_key = APP.db.get("api_key");
-        $scope.settings_ckeditor = (APP.db.get("settings_ckeditor").match(/true/gi) ? true : false);
+        $scope.settings_ckeditor = (APP.db.get("settings_ckeditor") && APP.db.get("settings_ckeditor").match(/true/gi) ? true : false);
 
         // $scope.timerStartOffet = APP.db.get('count');
         // $scope.query = APP.db.get('query');
