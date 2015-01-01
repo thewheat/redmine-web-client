@@ -437,14 +437,18 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http', '$location'
 
     $scope.selectRowManual = function(){
       var rowid = $scope.projects_parent_id_manual_select;
-
-
       $scope.loadProjectPriorities(rowid);
       $scope.loadProjectMembers(rowid);
       $scope.loadProjectStatuses(rowid)
       $scope.loadProjectTrackers(rowid)
     }
-
+    $scope.showAddIssueForm = function(){
+      if($scope.settings_ckeditor && !CKEDITOR.instances['ckeditor'])
+        CKEDITOR.replace( 'ckeditor' );
+      else if(!$scope.settings_ckeditor && CKEDITOR.instances['ckeditor'])
+        CKEDITOR.instances['ckeditor'].destroy();
+      $scope.scrollTo('add-issue');
+    }
     $scope.selectProjectToAddIssue = function(row){
       $scope.projects_add_issue = true;
       $scope.projects_parent_name = row.name;
@@ -454,12 +458,7 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http', '$location'
       $scope.loadProjectMembers(row.id);
       $scope.loadProjectStatuses(row.id)
       $scope.loadProjectTrackers(row.id)
-
-      if($scope.settings_ckeditor && !CKEDITOR.instances['ckeditor'])
-        CKEDITOR.replace( 'ckeditor' );
-      else if(!$scope.settings_ckeditor && CKEDITOR.instances['ckeditor'])
-        CKEDITOR.instances['ckeditor'].destroy();
-      $scope.scrollTo('add-issue');
+      $scope.showAddIssueForm();
     }
     $scope.clearAddIssue = function(){
       $scope.projects_add_issue = false;
@@ -559,6 +558,7 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http', '$location'
           }
         })
       }
+      $scope.showAddIssueForm();
     }
     $scope.addIssue = function(){
       $scope.projects_issue_message = 'adding...';
