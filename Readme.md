@@ -14,7 +14,8 @@
 
 # Installation
 
-- Copy folder to server (all files should be included)
+- Copy folder to server
+- Run ```bower install``` from ```ui/app``` directory
 - If there are any problems it is probably with PHP Redmine API as my code
 
 # Code Folders
