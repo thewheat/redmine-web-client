@@ -1,8 +1,6 @@
 'use strict';
 
-/* Controllers */
-
-var appControllers = angular.module('rcmControllers', []);
+var appControllers = angular.module('rcmControllers', ['angular-bootstrap-select']);
 var APP = {};
 APP.db = (function(){
   function supports_html5_storage() {
@@ -18,7 +16,7 @@ APP.db = (function(){
   }
   function get(key, defaultValue){
     if(!supports_html5_storage()) return "";
-    console.log(key, localStorage[key]);
+    //console.log(key, localStorage[key]);
     if(localStorage[key] == null) return defaultValue;
     return localStorage[key];
   }
@@ -68,7 +66,6 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http', '$location'
         if(isNaN($scope.issueReloadCounter)) $scope.issueReloadCounter = 0;
         else
           $scope.issueReloadCounter -= 1;
-        console.log($scope.issueReloadCounter);
         if($scope.show_issues && $scope.is_searching_mine) {
           if($scope.issueReloadCounter <= 0)
             $scope.loadMyIssues();
@@ -102,6 +99,18 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http', '$location'
       $http.get('../../api/?mode=projects&action=members&project_id=' + $project_id + $scope.serverDetails())
         .success(function(data) {
           $scope.project_members = data['memberships'];
+          if($scope.issue_assignee){
+            var found = false;
+            for(var i = data['memberships'].length-1; i >= 0 ; i--){
+              if(data['memberships'][i]
+                && data['memberships'][i].user
+                && data['memberships'][i].user.id == $scope.issue_assignee){
+                found = true;
+                break;
+              }
+            }
+            if(!found) $scope.issue_assignee = '';
+          }
         })
         .error(function(data,status){
           alert('Failed: ' + status + ": " + data);
@@ -141,18 +150,43 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http', '$location'
           alert('Failed: ' + status + ": " + data);
         });
     }
-    $scope.loadProjects = function(hideLoadingMessage){
+    $scope.loadProjects = function(hideLoadingMessage, callback){
       if(!hideLoadingMessage)
         $scope.setGlobalMessage('loading...');
       if(!$scope.haveServerDetails()) { $scope.notifiyNoServerDetails(); return; }
+
+
       $http.get('../../api/?mode=projects&action=all' + $scope.serverDetails())
         .success(function(data) {
           if(!hideLoadingMessage)
             $scope.setGlobalMessage('');
+
+          $scope.projects_parent_id_manual_select_ori = $scope.projects_parent_id_manual_select;
+          $scope.projects_parent_id_manual_select += '_';
           $scope.projects = data['projects'].filter(function(item){return item.status == "1"});
+          $scope.projects = $scope.projects.map(function(element){
+            element.displayname = '';
+            if(element.parent && element.parent.name){
+              element.displayname = element.parent.name + " - ";
+            }
+            element.displayname += element.name;
+            return element;
+          });
+          $timeout(function(){
+            $scope.projects_parent_id_manual_select = $scope.projects_parent_id_manual_select_ori;
+          }, 100);
+          if(callback && callback['success'] && typeof(callback['success']) == "function"){
+            callback['success'](data);
+            return;
+          }
         })
         .error(function(data,status){
-          alert('Failed: ' + status + ": " + data);
+          if(callback && callback['error'] && typeof(callback['error']) == "function"){
+            callback['error'](data, status);
+            return;
+          }
+          else
+            alert('Failed: ' + status + ": " + data);
         });
     }
     $scope.loadSearchIssues = function(offset, search, count){
@@ -288,19 +322,19 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http', '$location'
       if($scope.timerEnabled){
         $scope.timer_message = '';
         $scope.timerStart = (new Date()).getTime();
-        console.log("start   : " + $scope.timerStart);
-        console.log("  offset: " + $scope.timerStartOffet);
+        // console.log("start   : " + $scope.timerStart);
+        // console.log("  offset: " + $scope.timerStartOffet);
           
         $scope.timerObject = $timeout($scope.tick ,100); 
       }
       else{
         $scope.timer_message = 'Logging Time';
         $scope.addTime($scope.timerCount/36000.0);
-        console.log("stop        : " + $scope.timerStart);
-        console.log("  old offset: " + $scope.timerStartOffet);
+        // console.log("stop        : " + $scope.timerStart);
+        // console.log("  old offset: " + $scope.timerStartOffet);
         $scope.timerStartOffet = (new Date()).getTime() - $scope.timerStart + $scope.timerStartOffet;
-        console.log("stop        : " + $scope.timerStart);
-        console.log("  new offset: " + $scope.timerStartOffet);
+        // console.log("stop        : " + $scope.timerStart);
+        // console.log("  new offset: " + $scope.timerStartOffet);
         $scope.resetTimer();
       }
     }
@@ -400,6 +434,17 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http', '$location'
       $scope.projects_parent_id = row.id;
       $scope.scrollTo('add-project');
     }
+
+    $scope.selectRowManual = function(){
+      var rowid = $scope.projects_parent_id_manual_select;
+
+
+      $scope.loadProjectPriorities(rowid);
+      $scope.loadProjectMembers(rowid);
+      $scope.loadProjectStatuses(rowid)
+      $scope.loadProjectTrackers(rowid)
+    }
+
     $scope.selectProjectToAddIssue = function(row){
       $scope.projects_add_issue = true;
       $scope.projects_parent_name = row.name;
@@ -489,7 +534,6 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http', '$location'
       }
       $http.post('../../api/?mode=issues&action=addUpdate' + $scope.serverDetails(), inputData)
         .success(function(data) {
-          console.log(data);
           if(typeof(onsuccess)=="function") onsuccess();
           else {
             $scope.issues_update_message = 'Added';
@@ -502,14 +546,31 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http', '$location'
           else alert('Failed: ' + status + ": " + data);
         });
     }
+    $scope.showGenericIssueForm = function(){
+      $scope.projects_add_issue = true;
+      $scope.projects_parent_name = '';
+      $scope.projects_parent_id = 0;
+
+      if(!$scope.projects || $scope.projects.length == 0){
+        $scope.setGlobalMessage('loading projects...');
+        $scope.loadProjects(true, {
+          'success': function(){
+
+          }
+        })
+      }
+    }
     $scope.addIssue = function(){
       $scope.projects_issue_message = 'adding...';
       if($scope.settings_ckeditor && CKEDITOR.instances['ckeditor']){
         $scope.issue_description = CKEDITOR.instances['ckeditor'].getData();
       }
       if(!$scope.haveServerDetails()) { $scope.notifiyNoServerDetails(); return; }
+      var project_id = $scope.projects_parent_id;
+      if(!project_id) project_id = $scope.projects_parent_id_manual_select;
+
       var inputData = {
-        project_id: $scope.projects_parent_id,
+        project_id: project_id,
         subject: $scope.issue_subject,
         description: $scope.issue_description,
         priority_id: $scope.issue_priority,
@@ -552,13 +613,14 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http', '$location'
       $scope.project_identifier = '';
       $scope.projects_parent_id = 0;
     }
-    $scope.searchProjectsFilter = function(element){
+    $scope.searchProjectsFilter = function(element, searchTerm){
+      if(typeof(searchTerm) == "undefined" || searchTerm == "") return true;
       var name = '';
       if(element.parent && element.parent.name)
         name = element.parent.name + ' - ';
       if(element.name)
         name += element.name;
-      var search_terms = $scope.query_projects.split(" ");
+      var search_terms = searchTerm.split(" ");
       var match = true;
       for(var i = 0; i < search_terms.length; i++){
         var regex = RegExp(search_terms[i], 'gi');
@@ -566,6 +628,12 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http', '$location'
         if(!match) break;
       }
       return match;
+    }
+    $scope.searchProjectsFilterProjectList = function(element){
+      return $scope.searchProjectsFilter(element, $scope.query_projects);
+    }
+    $scope.searchProjectsFilterAddIssue = function(element){
+      return $scope.searchProjectsFilter(element, $scope.issue_search_project);
     }
 
     $scope.show_issues = ("true" == APP.db.get("show_issues","true"));
@@ -610,4 +678,3 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http', '$location'
     }
 
   }]);
-

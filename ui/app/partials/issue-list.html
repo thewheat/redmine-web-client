@@ -49,7 +49,20 @@
 
         <div id='add-issue' class='issue section' ng-show="projects_add_issue">
           <form class="form-inline" role="form">
-            <h4>Add Issue to <a href="{{settings_server}}/projects/{{projects_parent_id}}" target="_blank">{{projects_parent_name}} ({{projects_parent_id}})</a></h4>
+            <h4>Add Issue to 
+              <a ng-show='projects_parent_id' href="{{settings_server}}/projects/{{projects_parent_id}}" target="_blank">{{projects_parent_name}} ({{projects_parent_id}})</a>
+              <span ng-show='!projects_parent_id' >
+                <select selectpicker
+                  ng-model="projects_parent_id_manual_select"
+                  ng-options="row.id as row.displayname for row in projects"
+                  ng-change='selectRowManual(rowid)'
+                  toggle-dropdown
+                  data-live-search='true'
+                >
+                  <option value="">--Select a Project--</option>
+                </select>
+              </span>
+            </h4>
             <div><input ng-model="issue_subject" placeholder="Subject">
             <textarea id='ckeditor' placeholder="Description" ng-model="issue_description"></textarea>
           </div>
@@ -92,6 +105,7 @@
             <button class="btn btn-danger" ng-click="query = ''" ng-show="query != ''">x</button>
             <button class="btn" ng-click="loadMyIssues()">Reload My Issues</button>
             <button class="btn" ng-click="loadSearchIssues()">Search All Issues</button>
+            <button class="btn" ng-click="showGenericIssueForm()">Add Issue</button>
           </span>
           <button class="btn" ng-click="toggleSettings()">Settings</button>
           <button class="btn btn-info btn-small" ng-show="global_message != ''">{{global_message}}</button>
@@ -157,7 +171,7 @@
 
       <ul class="projects">
         <li class="project" 
-            ng-repeat="row in projects | filter:searchProjectsFilter">
+            ng-repeat="row in projects | filter:searchProjectsFilterProjectList">
           <a href="{{settings_server}}/projects/{{row.id}}" target="_blank">{{row.parent.name}} <span ng-show="row.parent != null"> - </span>{{row.name}}</a>
           <div class="btn-group">
             <button class="btn btn-primary btn-small" ng-click="selectProjectRow(row)">Start Work</button>
@@ -169,5 +183,3 @@
     </div>
   </div>
 </div>
-<!-- works with https://github.com/a-ono/redmine_ckeditor -->
-<script src="//cdn.ckeditor.com/4.4.6/standard/ckeditor.js"></script>
