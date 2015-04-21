@@ -3,11 +3,11 @@
     <div class='action' id='timer'>
         <div class='issue brief' ng-show="selectedIssue != null">
           <h4><a href="{{settings_server}}/issues/{{selectedIssue.id}}" target="_blank">#{{selectedIssue.id}} : {{selectedIssue.subject}}</a></h4>
-          <h5><a href="{{settings_server}}/projects/{{selectedIssue.project.id}}" target="_blank">{{selectedIssue.project.name}}</a> - {{selectedIssue.assigned_to.name}}</h5>
+          <h5><a href="{{settings_server}}/projects/{{selectedIssue.project.id}}/issues" target="_blank">{{selectedIssue.project.name}}</a> - {{selectedIssue.assigned_to.name}}</h5>
         </div>
         <div class='project brief' ng-show="selectedProject != null">
-          <h4><a href="{{settings_server}}/projects/{{selectedProject.id}}" target="_blank">{{selectedProject.name}} ({{selectedProject.id}})</a></h4>
-          <h5><a href="{{settings_server}}/projects/{{selectedProject.parent.id}}" target="_blank">{{selectedProject.parent.name}}</a></h5>
+          <h4><a href="{{settings_server}}/projects/{{selectedProject.id}}/issues" target="_blank">{{selectedProject.name}} ({{selectedProject.id}})</a></h4>
+          <h5><a href="{{settings_server}}/projects/{{selectedProject.parent.id}}/issues" target="_blank">{{selectedProject.parent.name}}</a></h5>
         </div>
         <div class='timer' ng-show="selectedIssue != null || selectedProject != null">
           <div class="btn-toolbar">
@@ -50,7 +50,7 @@
         <div id='add-issue' class='issue section' ng-show="projects_add_issue">
           <form class="form-inline" role="form">
             <h4>Add Issue to 
-              <a ng-show='projects_parent_id' href="{{settings_server}}/projects/{{projects_parent_id}}" target="_blank">{{projects_parent_name}} ({{projects_parent_id}})</a>
+              <a ng-show='projects_parent_id' href="{{settings_server}}/projects/{{projects_parent_id}}/issues" target="_blank">{{projects_parent_name}} ({{projects_parent_id}})</a>
               <span ng-show='!projects_parent_id' >
                 <select selectpicker
                   ng-model="projects_parent_id_manual_select"
@@ -172,7 +172,7 @@
       <ul class="projects">
         <li class="project" 
             ng-repeat="row in projects | filter:searchProjectsFilterProjectList">
-          <div><a href="{{settings_server}}/projects/{{row.id}}" target="_blank">{{row.parent.name}} <span ng-show="row.parent != null"> - </span>{{row.name}}</a></div>
+          <div><a href="{{settings_server}}/projects/{{row.id}}/issues" target="_blank">{{row.parent.name}} <span ng-show="row.parent != null"> - </span>{{row.name}}</a></div>
           <div class="btn-group">
             <button class="btn btn-primary btn-small" ng-click="selectProjectRow(row)">Start Work</button>
             <button class="btn btn-default btn-small" href ng-click="selectProjectToAddSubProject(row)">+ Sub Project</button>
