@@ -491,8 +491,13 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http', '$location'
     $scope.addProject = function(){
       $scope.projects_message = 'adding...';
       if(!$scope.haveServerDetails()) { $scope.notifiyNoServerDetails(); return; }
-      if(!$scope.project_identifier) $scope.project_identifier = $scope.project_name.replace(/ /g,'-').replace(/\W+/g,'-');
-      var inputData = {
+      if(!$scope.project_identifier) {
+        $scope.project_identifier = $scope.project_name.replace(/ /g,'-').replace(/\W+/g,'-');
+      }
+      while($scope.project_identifier.match(/--/)){
+        $scope.project_identifier = $scope.project_identifier.replace(/--/g,'-');
+      }
+       var inputData = {
         name: $scope.project_name,
         identifier: $scope.project_identifier,
         parent_id: $scope.projects_parent_id
