@@ -491,7 +491,7 @@ appControllers.controller('RMCCtrl', ['$scope', '$timeout', '$http', '$location'
     $scope.addProject = function(){
       $scope.projects_message = 'adding...';
       if(!$scope.haveServerDetails()) { $scope.notifiyNoServerDetails(); return; }
-      if(!$scope.project_identifier) $scope.project_identifier = $scope.project_name.replace(/ /g,'-').replace(/\W+/g,'');
+      if(!$scope.project_identifier) $scope.project_identifier = $scope.project_name.replace(/ /g,'-').replace(/\W+/g,'-');
       var inputData = {
         name: $scope.project_name,
         identifier: $scope.project_identifier,
